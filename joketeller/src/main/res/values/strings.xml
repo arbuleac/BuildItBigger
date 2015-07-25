@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">JokeTeller</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="empty_joke">I need a joke!</string>
+</resources>
