@@ -1,21 +1,17 @@
 package com.udacity.gradle.builditbigger;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.arbuleac.joketeller.JokeActivity;
 import com.arbuleac.joketeller.api.myApi.MyApi;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
+import com.udacity.gradle.builditbigger.utils.Navigation;
 
 import java.io.IOException;
 
@@ -64,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 try {
                     String string = myApiService.tellJoke().execute().getData();
-                    Thread.sleep(5000);
+                    //TODO This is for testing progress bar!
+                    Thread.sleep(1000);
                     if (!subscriber.isUnsubscribed()) {
                         subscriber.onNext(string);
                     }
@@ -111,13 +108,13 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onError(Throwable e) {
                         Toast.makeText(MainActivity.this, getString(R.string.error_get_joke), Toast.LENGTH_LONG).show();
+                        loadingPb.setVisibility(View.GONE);
+                        view.setEnabled(true);
                     }
 
                     @Override
                     public void onNext(String s) {
-                        Intent jokeIntent = new Intent(MainActivity.this, JokeActivity.class);
-                        jokeIntent.putExtra(JokeActivity.EXTRA_JOKE, s);
-                        startActivity(jokeIntent);
+                        Navigation.get().joke(MainActivity.this, s);
                     }
                 });
     }
