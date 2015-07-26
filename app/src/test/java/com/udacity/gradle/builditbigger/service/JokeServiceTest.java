@@ -21,7 +21,7 @@ public class JokeServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        service = new JokeService();
+        service = new JokeService("http://localhost:8080/_ah/api/");
     }
 
     @After
@@ -46,6 +46,6 @@ public class JokeServiceTest {
                 fail("Error while getting joke");
             }
         });
-        latch.await(20, TimeUnit.SECONDS);
+        latch.await(5, TimeUnit.SECONDS);
     }
 }

@@ -5,6 +5,8 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 
 import java.io.IOException;
 
@@ -27,13 +29,14 @@ public class JokeService {
     }
 
     public JokeService() {
-        MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(),
-                new AndroidJsonFactory(), null)
-                // options for running against local devappserver
-                // - 10.0.2.2 is localhost's IP address in Android emulator
-                // - turn off compression when running against local devappserver
-                //TODO replace this!!! I use Genymotion
-                .setRootUrl("http://10.0.3.2:8080/_ah/api/")
+        //TODO replace this!!! I use Genymotion
+        this("http://10.0.3.2:8080/_ah/api/");
+    }
+
+    public JokeService(String url) {
+        MyApi.Builder builder = new MyApi.Builder(new NetHttpTransport(),
+                new GsonFactory(), null)
+                .setRootUrl(url)
                 .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
                     @Override
                     public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
@@ -41,7 +44,6 @@ public class JokeService {
                     }
                 });
         // end options for devappserver
-
         myApiService = builder.build();
     }
 
