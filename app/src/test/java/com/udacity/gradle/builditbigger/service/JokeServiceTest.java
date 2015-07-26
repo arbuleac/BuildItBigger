@@ -21,6 +21,7 @@ public class JokeServiceTest {
 
     @Before
     public void setUp() throws Exception {
+        //TODO JUnit should run upon localhost and not emulator
         service = new JokeService("http://localhost:8080/_ah/api/");
     }
 
