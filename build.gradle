@@ -11,6 +11,18 @@ buildscript {
         // in the individual module build.gradle files
     }
 }
+task runAndTest(dependsOn: ":JokeApi:appengineRun") {
+    project(":JokeApi").afterEvaluate { JokeApi ->
+        JokeApi.extensions.appengine.daemon = true
+    }
+    doLast {
+        testWrapper.execute()
+    }
+}
+
+task testWrapper(type: GradleBuild) {
+    tasks = ['test']
+}
 
 allprojects {
     repositories {
