@@ -41,4 +41,5 @@ dependencies {
     compile project(':joketeller')
     compile project(path: ':JokeApi', configuration: 'android-endpoints')
     compile 'io.reactivex:rxandroid:0.25.0'
+    testCompil 'junit:junit:4.12'
 }

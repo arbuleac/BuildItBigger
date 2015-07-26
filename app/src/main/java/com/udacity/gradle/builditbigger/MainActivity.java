@@ -7,13 +7,8 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.arbuleac.joketeller.api.myApi.MyApi;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.extensions.android.json.AndroidJsonFactory;
-import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
-import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
+import com.udacity.gradle.builditbigger.service.JokeService;
 import com.udacity.gradle.builditbigger.utils.Navigation;
-
-import java.io.IOException;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -24,7 +19,6 @@ import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
-    private MyApi myApiService = null;
     private Observable<String> observable;
     private Subscription subscription;
     private ProgressBar loadingPb;
@@ -36,40 +30,25 @@ public class MainActivity extends AppCompatActivity {
         loadingPb = (ProgressBar) findViewById(R.id.loading_pb);
         observable = Observable.create(new Observable.OnSubscribe<String>() {
             @Override
-            public void call(Subscriber<? super String> subscriber) {
+            public void call(final Subscriber<? super String> subscriber) {
                 if (!subscriber.isUnsubscribed()) {
                     subscriber.onStart();
                 }
-                if (myApiService == null) {  // Only do this once
-                    MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(),
-                            new AndroidJsonFactory(), null)
-                            // options for running against local devappserver
-                            // - 10.0.2.2 is localhost's IP address in Android emulator
-                            // - turn off compression when running against local devappserver
-                            //TODO replace this!!! I use Genymotion
-                            .setRootUrl("http://10.0.3.2:8080/_ah/api/")
-                            .setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
-                                @Override
-                                public void initialize(AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
-                                    abstractGoogleClientRequest.setDisableGZipContent(true);
-                                }
-                            });
-                    // end options for devappserver
+                JokeService.get().loadJoke(new JokeService.JokeCallback() {
+                    @Override
+                    public void onNext(String joke) {
+                        if (!subscriber.isUnsubscribed()) {
+                            subscriber.onNext(joke);
+                        }
+                    }
 
-                    myApiService = builder.build();
-                }
-                try {
-                    String string = myApiService.tellJoke().execute().getData();
-                    //TODO This is for testing progress bar!
-                    Thread.sleep(1000);
-                    if (!subscriber.isUnsubscribed()) {
-                        subscriber.onNext(string);
+                    @Override
+                    public void onError(Throwable e) {
+                        if (!subscriber.isUnsubscribed()) {
+                            subscriber.onError(e);
+                        }
                     }
-                } catch (Exception e) {
-                    if (!subscriber.isUnsubscribed()) {
-                        subscriber.onError(e);
-                    }
-                }
+                });
                 if (!subscriber.isUnsubscribed()) {
                     subscriber.onCompleted();
                 }
